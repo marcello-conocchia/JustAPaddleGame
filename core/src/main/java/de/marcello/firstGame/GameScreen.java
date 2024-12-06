@@ -60,19 +60,22 @@ public class GameScreen extends ScreenAdapter {
 			ballVelocity.x = -ballVelocity.x;
 		}
 		if(ballPosition.x >= Gdx.graphics.getWidth() ) {
-			ballPosition.x = Gdx.graphics.getHeight() - ballRadius;
+			ballPosition.x = Gdx.graphics.getWidth() - ballRadius;
 			ballVelocity.x = -ballVelocity.x;
 		}
 		if(ballPosition.y <= -ballRadius) {
 	        ballPosition = new Vector2(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() /2);
 	        ballVelocity = new Vector2(random.nextFloat() * 200, 300.0f);
 		}
-		if(ballPosition.y - ballRadius >= paddlePosition.x - (paddleHeight/2) ) {
-			if(ballPosition.x >= paddlePosition.x -(paddleWidth /2) && ballPosition.x <= paddlePosition.x + (paddleWidth /2))
-		
-			ballVelocity.y *= -2.0f;
-			
-		}
+		if (ballPosition.y - ballRadius <= paddlePosition.y + paddleHeight && 
+			    ballPosition.y + ballRadius >= paddlePosition.y) {
+			    if (ballPosition.x >= paddlePosition.x && 
+			        ballPosition.x <= paddlePosition.x + paddleWidth) {
+			        
+			        ballVelocity.y = -ballVelocity.y; 
+			    }
+			}
+
 		
 		
 		
