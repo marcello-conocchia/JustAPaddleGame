@@ -21,6 +21,9 @@ public class GameScreen extends ScreenAdapter {
     float paddleWidth = 100.00f;
     float paddleHeight = 32.0f;
     Random random;
+    Vector2 paddlePositionHigh;
+    float paddleWidthHigh = 100.00f;
+    float paddleHeightHigh = 32.0f;
 	public GameScreen() {
 
         shapeRenderer = new ShapeRenderer();
@@ -28,7 +31,7 @@ public class GameScreen extends ScreenAdapter {
         ballPosition = new Vector2(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() /2);
         random = new Random();
         ballVelocity = new Vector2(random.nextFloat() * 200 - 100, 300.0f);
-       
+        paddlePositionHigh = new Vector2(Gdx.graphics.getWidth() / 2 -  paddleWidth /2, Gdx.graphics.getHeight() - 65.0f);
 	}
 	
 	@Override
@@ -36,8 +39,14 @@ public class GameScreen extends ScreenAdapter {
 		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
 		paddlePosition.x -= maxVelocity * delta;
 		}
+		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+			paddlePositionHigh.x -= maxVelocity * delta;
+		}
 		if(Gdx.input.isKeyPressed(Input.Keys.D)) {
 		paddlePosition.x += maxVelocity * delta;
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+			paddlePositionHigh.x += maxVelocity * delta;
 		}
 
 		
@@ -50,11 +59,14 @@ public class GameScreen extends ScreenAdapter {
 		}else if (paddlePosition.x > Gdx.graphics.getWidth() - paddleWidth) {
 			paddlePosition.x = Gdx.graphics.getWidth() - paddleWidth ;
 		}
-		
-		if(ballPosition.y >= Gdx.graphics.getHeight() - ballRadius) {
-			ballPosition.y = Gdx.graphics.getHeight() - ballRadius;
-			ballVelocity.y = -ballVelocity.y;
+		if(paddlePositionHigh.x < 0.0) {
+			paddlePositionHigh.x = 0.0f;
+		}else if (paddlePositionHigh.x > Gdx.graphics.getWidth() - paddleWidthHigh) {
+			paddlePositionHigh.x = Gdx.graphics.getWidth() - paddleWidthHigh ;
 		}
+		
+		
+		
 		if(ballPosition.x <= ballRadius) {
 			ballPosition.x = ballRadius;
 			ballVelocity.x = -ballVelocity.x;
@@ -67,14 +79,18 @@ public class GameScreen extends ScreenAdapter {
 	        ballPosition = new Vector2(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() /2);
 	        ballVelocity = new Vector2(random.nextFloat() * 200, 300.0f);
 		}
-		if (ballPosition.y - ballRadius <= paddlePosition.y + paddleHeight && 
-			    ballPosition.y + ballRadius >= paddlePosition.y) {
-			    if (ballPosition.x >= paddlePosition.x && 
-			        ballPosition.x <= paddlePosition.x + paddleWidth) {
-			        
-			        ballVelocity.y = -ballVelocity.y; 
-			    }
-			}
+		
+		if(ballPosition.y >= Gdx.graphics.getHeight()) {
+	        ballPosition = new Vector2(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() /2);
+	        ballVelocity = new Vector2(random.nextFloat() * 200, 300.0f);
+		}
+		
+		
+		
+
+		checkCollisonWithLowerPaddle(paddlePosition, paddleWidth, paddleHeight);
+		checkCollisonWithHigherPaddle(paddlePositionHigh, paddleWidthHigh, paddleHeightHigh);
+
 
 		
 		
@@ -88,8 +104,8 @@ public class GameScreen extends ScreenAdapter {
         shapeRenderer.setColor(Color.GOLD);
         shapeRenderer.circle(ballPosition.x, ballPosition.y, ballRadius);
         shapeRenderer.rect(paddlePosition.x, paddlePosition.y, paddleWidth, paddleHeight);
+        shapeRenderer.rect(paddlePositionHigh.x, paddlePositionHigh.y, paddleWidthHigh, paddleHeightHigh);;
         shapeRenderer.end();
-        
 	}
 	
 	@Override
@@ -101,4 +117,27 @@ public class GameScreen extends ScreenAdapter {
 	public void hide() {
 		this.dispose();
 	}
+	
+	public void checkCollisonWithLowerPaddle(Vector2 paddlePosition, float paddleWidth, float paddleHeight) {
+	    if (ballPosition.y + ballRadius >= paddlePosition.y &&
+	        ballPosition.y - ballRadius <= paddlePosition.y + paddleHeight) {
+	        if (ballPosition.x >= paddlePosition.x && 
+	            ballPosition.x <= paddlePosition.x + paddleWidth) {
+	            ballVelocity.y *= -1f; // Ball ändert die Richtung
+	        }
+	    }
+	}
+
+	public void checkCollisonWithHigherPaddle(Vector2 paddlePositionHigh, float paddleWidthHigh, float paddleHeightHigh) {
+	    if (ballPosition.y + ballRadius >= paddlePositionHigh.y && 
+	        ballPosition.y - ballRadius <= paddlePositionHigh.y + paddleHeightHigh) {
+	        if (ballPosition.x >= paddlePositionHigh.x && 
+	            ballPosition.x <= paddlePositionHigh.x + paddleWidthHigh) {
+	            ballVelocity.y *= -1f; // Ball ändert die Richtung nur bei Kollision
+	        }
+	    }
+	}
+
+
+	
 }
